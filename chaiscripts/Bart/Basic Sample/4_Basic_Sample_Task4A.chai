@@ -1,0 +1,36 @@
+// Basic sample task 4 - first way of implementing scaling
+// This function is called for multiple values of "now"
+def scene_at(now)
+{
+  // Create animation: x goes from -10 to +10 in 5 seconds
+  var x = Animations.animate(-10, 10, seconds(5))
+
+  // Create camera at (x[now], 0, 5).
+  // x[now] returns the value of x at the current time in the animation
+  var camera = Cameras.perspective( [ "eye": pos(x[now],0,5),
+                                      "look_at": pos(0,0,0),
+                                      "up": vec(0,1,0) ] )
+
+  // Create material
+  var material = Materials.uniform( [ "ambient": Colors.white(),
+                                      "diffuse": Colors.white() ] )
+
+  // Create decorated sphere
+  var root = decorate(material, sphere())
+
+  // Create empty list of lights 
+  var lights = [ ]
+
+  create_scene(camera, root, lights)
+}
+
+var raytracer = Raytracers.v2()
+var renderer = Renderers.standard( [ "width": 500,
+                                     "height": 500,
+                                     "sampler": Samplers.multijittered(2),
+                                     "ray_tracer": raytracer ] )
+
+pipeline( scene_animation(scene_at, seconds(1)),
+          [ Pipeline.animation(30),
+            Pipeline.renderer(renderer),
+            Pipeline.ppm() ] )

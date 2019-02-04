@@ -1,0 +1,37 @@
+// Basic sample task 4 - second way of implementing scaling
+// This function is called for multiple values of "now"
+// In this case, the camera stays at the same location but the sphere moves
+def scene_at(now)
+{
+// Create material - define material properties
+  var material = Materials.uniform( [ "ambient": Colors.white(),
+                                      "diffuse": Colors.white() ] )
+
+  // Create animation: x goes from +5 to -5 in 1 second
+  var z = Animations.animate(5.0, -5.0, seconds(1))
+
+  // Create primitives 
+  
+  var sphere = translate(vec(0,0,2-z[now]), decorate(material, sphere()))
+      
+  // Create empty list of lights
+  var lights = [ ]
+  
+  // Create camera at a fixed position
+  var camera = Cameras.perspective( [ "eye": pos(0,0,10),
+                                      "look_at": pos(0,0,0),
+                                      "up": vec(0,1,0) ] )
+
+  create_scene(camera, sphere, lights)
+}
+
+var raytracer = Raytracers.v2()
+var renderer = Renderers.standard( [ "width": 500,
+                                     "height": 500,
+                                     "sampler": Samplers.multijittered(2),
+                                     "ray_tracer": raytracer ] )
+
+pipeline( scene_animation(scene_at, seconds(1)),
+          [ Pipeline.animation(30),
+            Pipeline.renderer(renderer),
+            Pipeline.ppm()] )

@@ -1,0 +1,39 @@
+Sampler performance measurements
+Test of 10.000 sampler calls
+
+Single Sampler() : 1msec
+
+Random Sampler(1) : 32 msec
+Random Sampler(2) : 34 msec
+Random Sampler(3) : 36 msec
+Random Sampler(4) : 37 msec
+
+Stratified Sampler(1,1) : 1 msec
+Stratified Sampler(2,2) : 4 msec
+Stratified Sampler(3,3) : 7 msec
+Stratified Sampler(4,4) : 9 msec
+
+Jittered Sampler(1,1) : 32 msec
+Jittered Sampler(2,2) : 37 msec
+Jittered Sampler(3,3) : 44 msec
+Jittered Sampler(4,4) : 52 msec
+
+HalfJittered Sampler(1,1) : 32 msec
+HalfJittered Sampler(2,2) : 37 msec
+HalfJittered Sampler(3,3) : 44 msec
+HalfJittered Sampler(4,4) : 53 msec
+==> comparable with Jittered, only just other random ranges
+
+NRooks Sampler(1) : 36 msec
+NRooks Sampler(2) : 40 msec
+NRooks Sampler(3) : 44 msec
+NRooks Sampler(4) : 50 msec
+NRooks Sampler(8) : 62 msec
+
+MultiJittered Sampler(1) : 35 msec
+MultiJittered Sampler(2) : 44 msec
+MultiJittered Sampler(3) : 56 msec
+MultiJittered Sampler(4) : 70 msec
+MultiJittered Sampler(8) : 154 msec
+
+

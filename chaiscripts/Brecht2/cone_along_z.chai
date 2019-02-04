@@ -1,0 +1,29 @@
+def scene_at(now)
+{
+  
+  var camera = Cameras.perspective( [ "eye": pos(-5,5,18),
+                                      "look_at": pos(0,0,0),
+                                      "up": vec(0,1,0) ] )
+                                      
+  var meshmaterial = Materials.uniform( [ "ambient": Colors.red() * 0.2,
+  									  	    "diffuse": Colors.blue() * 0.8 ] )						
+	
+  var root = decorate( meshmaterial, cone_along_z() )
+  
+  var lights = [ Lights.omnidirectional( pos(0,10,20), Colors.white() ) ]
+  
+  create_scene(camera, root, lights)
+  
+}
+
+var renderer = Renderers.standard( [ "width": 500,
+                                     "height": 500,
+                                     "sampler": Samplers.single(),
+                                     "ray_tracer": Raytracers.v6() ] )
+
+pipeline( scene_animation(scene_at, seconds(1)),
+          [ Pipeline.animation(1),
+            Pipeline.renderer(renderer),
+            Pipeline.wif(),
+            Pipeline.base64(),
+            Pipeline.stdout() ] )

@@ -1,0 +1,44 @@
+def scene_at(now)
+{
+  
+  var camera = Cameras.perspective( [ "eye": pos(-5,2,5),
+                                      "look_at": pos(0,0,0),
+                                      "up": vec(0,1,0) ] )
+                                      
+  var meshmaterial = Materials.uniform( [ "ambient": Colors.yellow() * 0.2,
+  									  	    "diffuse": Colors.red() * 0.8 ] )
+
+  var white = Materials.uniform( [ "ambient": Colors.white() * 0.1,
+                                   "diffuse": Colors.white() * 0.8 ] )
+  var black = Materials.uniform( [ "ambient": Colors.white() * 0.1,
+                                   "diffuse": Colors.black() * 0.8 ] )
+
+  var plane_material = Materials.horizontal_lines(0.5, white, black )
+
+  var floormaterial = Materials.horizontal_lines(0.5, white, black)
+  
+  var angle = Animations.animate(degrees(0), degrees(360), seconds(40))
+
+  var primitives = []
+  primitives.push_back(decorate( meshmaterial, rotate_around_y(angle[now], mesh("C:/Users/Brecht/Desktop/al.obj")) ))
+  primitives.push_back(decorate( floormaterial, translate(vec(0,-2,0), xz_plane())))
+  
+  var root = union(primitives)
+  
+  var lights = [ Lights.omnidirectional( pos(0,10,20), Colors.white() ) ]
+  
+  create_scene(camera, root, lights)
+  
+}
+
+var renderer = Renderers.standard( [ "width": 500,
+                                     "height": 500,
+                                     "sampler": Samplers.halfjittered(4,4),
+                                     "ray_tracer": Raytracers.v6() ] )
+
+pipeline( scene_animation(scene_at, seconds(40)),
+          [ Pipeline.animation(1),
+            Pipeline.renderer(renderer),
+            Pipeline.wif(),
+            Pipeline.base64(),
+            Pipeline.stdout() ] )

@@ -1,0 +1,52 @@
+// Basic sample task 5 - rotating spheres 
+// This function is called for multiple values of "now"
+def scene_at(now)
+{
+  // Create animation: a animation goes from 0 to PI=3.14 in 1 second (to become circular effects)
+  var a = Animations.animate(0, 3.14, seconds(1))
+
+  // Camera is at a fixed position
+  // a[now] returns the value of a Animation at the current time
+  // the return value is expressed in radians, so the cosine and sine give the actual values on the axis
+  var a_now= a[now]
+  var x=cos(radians(a_now))
+  var y=sin(radians(a_now))
+  
+  // the camera is in a steady position, looking at the spheres to move
+  var camera = Cameras.perspective( [ "eye": pos(0,0,8),
+                                      "look_at": pos(0,0,0),
+                                      "up": vec(0,1,0) ] )
+
+  // Create material
+  var material = Materials.uniform( [ "ambient": Colors.white(),
+                                      "diffuse": Colors.white() ] )
+
+  // Create decorated sphere
+  var sphere_1 = decorate(material, sphere())
+  var sphere_2 = decorate(material, sphere())
+  
+  var primitives = []
+  // the value 3 is chosen for the best visualy fitting, call it experimental...
+  var xcoord = 3*x
+  var ycoord = 3*y
+  var zcoord = 0
+  primitives.push_back( translate(vec(ycoord,-xcoord,zcoord), sphere_1) )
+  primitives.push_back( translate(vec(-ycoord,xcoord,zcoord), sphere_2) )
+  var root=union(primitives)
+
+  // Create empty list of lights 
+  var lights = [ ]
+
+  create_scene(camera, root, lights)
+}
+
+var raytracer = Raytracers.v2()
+var renderer = Renderers.standard( [ "width": 500,
+                                     "height": 500,
+                                     "sampler": Samplers.multijittered(2),
+                                     "ray_tracer": raytracer ] )
+
+pipeline( scene_animation(scene_at, seconds(1)),
+          [ Pipeline.animation(30),
+            Pipeline.renderer(renderer),
+            Pipeline.ppm() ] )

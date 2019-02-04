@@ -1,0 +1,41 @@
+// Basic sample task 3
+// This function is called for multiple values of "now"
+
+def scene_at(now)
+{
+// Create material - define material properties
+  var material = Materials.uniform( [ "ambient": Colors.white(),
+                                      "diffuse": Colors.white() ] )
+
+  // Create animation: x goes from +5 to -5 in 1 second
+  // one sphere goes to the left, the other to the right
+  var x = Animations.animate(5.0, -5.0, seconds(1))
+
+  // Create primitives sphere1 and sphere2
+  var primitives = []
+  primitives.push_back( translate(vec(x[now],2,0), decorate(material, sphere())) )
+  primitives.push_back( translate(vec(5-x[now],-2,0), decorate(material, sphere())) )
+  
+  var root = union(primitives)
+      
+  // Create empty list of lights
+  var lights = [ ]
+  
+  // Create camera at a fixed position
+  var camera = Cameras.perspective( [ "eye": pos(0,0,10),
+                                      "look_at": pos(0,0,0),
+                                      "up": vec(0,1,0) ] )
+
+  create_scene(camera, root, lights)
+}
+
+var raytracer = Raytracers.v2()
+var renderer = Renderers.standard( [ "width": 500,
+                                     "height": 500,
+                                     "sampler": Samplers.multijittered(2),
+                                     "ray_tracer": raytracer ] )
+
+pipeline( scene_animation(scene_at, seconds(1)),
+          [ Pipeline.animation(30),
+            Pipeline.renderer(renderer),
+            Pipeline.ppm()] )

@@ -1,0 +1,35 @@
+def scene_at(now)
+{
+  var eye_position = Animations.ease(Animations.animate( pos(0, 1, 1), pos(20, 20, 20), seconds(5)), Easing.quintic_inout)
+  var camera = Cameras.perspective( [ "eye": eye_position[now],
+                                      "look_at": pos(0,0,0) ] )
+
+  var disk_material = Materials.uniform( [ "ambient": Colors.white() * 0.1,
+                                           "diffuse": Colors.white() * 0.8,
+                                           "specular": Colors.white() * 0.5 ] )
+
+  var white = Materials.uniform( [ "ambient": Colors.white() * 0.1,
+                                   "diffuse": Colors.white() * 0.8 ] )
+  var black = Materials.uniform( [ "ambient": Colors.white() * 0.1,
+                                   "diffuse": Colors.black() * 0.8 ] )
+
+  var plane_material = Materials.horizontal_lines( 0.1, black, white )
+
+  var root = decorate(plane_material, xz_plane())
+
+  var lights = [ Lights.omnidirectional( pos(0,5,0), Colors.white() ) ]
+
+  create_scene(camera, root, lights)
+}
+
+var raytracer = Raytracers.v6()
+
+var renderer = Renderers.standard( [ "width": 500,
+                                     "height": 500,
+                                     "sampler": Samplers.random(2),
+                                     "ray_tracer": raytracer ] )
+
+pipeline( scene_animation(scene_at, seconds(5)),
+          [ Pipeline.animation(30),
+            Pipeline.renderer(renderer),
+            Pipeline.ppm() ] )

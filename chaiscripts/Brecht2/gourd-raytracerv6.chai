@@ -1,0 +1,58 @@
+def scene_at(now)
+{
+  var camera = Cameras.perspective( [ "eye": pos(0,5,10),
+                                      "look_at": pos(0,0,0) ] )
+
+  var material = Materials.uniform( [ "ambient": Colors.white() * 0.1,
+                                                   "diffuse": Colors.white() * 0.8,
+                                                   "reflectivity": 0.8 ] )
+                                                  
+  var floor_material = Materials.uniform( [ "ambient": Colors.white() * 0.1,
+                                      "diffuse": Colors.white() * 0.8,
+                                      "specular": Colors.white(),
+                                      "specular_exponent": 100,
+                                      "reflectivity": 0,
+                                      "transparency": 0,
+                                      "refractive_index": 0 ] )
+  var primitives = []
+  primitives.push_back(decorate(floor_material, translate(vec(0,-1,0),xz_plane())))
+  primitives.push_back(decorate(material, mesh("C:/Users/Brecht/Desktop/cube.obj")))
+
+  var root = union(primitives)
+  
+  var t = Animations.animate(degrees(0), degrees(360), seconds(5))[now]
+
+  var pos1 = Animations.lissajous( [ "x_amplitude": 5,
+                                     "x_frequency": 2,
+                                     "z_amplitude": 5,
+                                     "z_frequency": 1,
+                                     "duration": seconds(5) ] )
+  var pos2 = Animations.lissajous( [ "x_amplitude": 5,
+                                     "x_frequency": 2,
+                                     "x_phase": degrees(180),
+                                     "z_amplitude": 5,
+                                     "z_frequency": 1,
+                                     "z_phase": degrees(180),
+                                     "duration": seconds(5) ] )
+
+  var lights = [ Lights.spot( pos(-5,5,1), pos1[now], degrees(40), Colors.red() ),
+                 Lights.spot( pos(5,5,1), pos2[now], degrees(40), Colors.green() ),
+                 Lights.omnidirectional( pos(0,1.9,0), Colors.white() )]
+
+
+  create_scene(camera, root, lights)
+}
+
+
+var raytracer   = Raytracers.v6()
+var renderer    = Renderers.standard( [ "width": 500,
+                                        "height": 500,
+                                        "sampler": Samplers.multijittered(2),
+                                        "ray_tracer": raytracer ] )
+                                        
+pipeline( scene_animation(scene_at, seconds(5)),
+          [ Pipeline.animation(30),
+            Pipeline.renderer(renderer),
+            Pipeline.wif(),
+            Pipeline.base64(),
+            Pipeline.stdout() ] )

@@ -1,0 +1,49 @@
+def scene_at(now)
+{
+  var eye_position = Animations.circular( [ "position": pos(0, 0, 5),
+                                            "around": pos(0, 0, 0),
+                                            "duration": seconds(3) ] )
+
+  var camera = Cameras.perspective( [ "eye": eye_position[now],
+                                      "look_at": pos(0,0,0) ] )
+
+  var wall_material = Materials.uniform( [ "ambient": Colors.white() * 0.1,
+                                           "diffuse": Colors.white() * 0.8,
+                                           "specular": Colors.black(),
+                                           "specular_exponent": 0 ] )
+
+  var white = Materials.uniform( [ "ambient": Colors.white() * 0.1,
+                                   "diffuse": Colors.white() * 0.8,
+                                   "specular": Colors.white() * 0.5,
+                                   "specular_exponent": 10 ] )
+  var black = Materials.uniform( [ "ambient": Colors.white() * 0.1,
+                                   "diffuse": Colors.white() * 0.1,
+                                   "specular": Colors.white() * 0.5,
+                                   "specular_exponent": 10 ] )
+
+
+  var back_wall = decorate(wall_material, translate( vec(0,0,-6), xy_plane()))
+  var wall = decorate(wall_material, translate( vec(-6,0,0), yz_plane()))
+  var floor = decorate(wall_material, translate( vec(0,-4,0), xz_plane()))
+  var cylinder = decorate(black ,cylinder_along_x())
+
+  var root = union( [ back_wall, floor, wall, cylinder ] )
+
+  var lights = [ Lights.omnidirectional( pos(5,5,5), Colors.white() * 0.5 ),
+                 Lights.omnidirectional( pos(-5,5,-5), Colors.white() * 0.5 )
+               ]
+
+  create_scene(camera, root, lights)
+}
+
+var raytracer   = Raytracers.v6()
+
+var renderer    = Renderers.standard( [ "width": 300,
+                                       "height": 300,
+                                       "sampler": Samplers.single(),
+                                       "ray_tracer": raytracer ] )
+
+pipeline( scene_animation(scene_at, seconds(3)),
+          [ Pipeline.animation(30),
+            Pipeline.renderer(renderer),
+            Pipeline.ppm() ] )

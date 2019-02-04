@@ -1,0 +1,61 @@
+def material(color)
+{
+  Materials.uniform( [ "ambient": color * 0.1,
+                       "diffuse": color * 0.8,
+                       "specular": Colors.white(),
+                       "specular_exponent": 100,
+                       "reflectivity": 0.5 ] )
+}
+
+def electron()
+{
+  decorate( material(Colors.red()), scale(0.1, 0.1, 0.1, sphere()) )
+}
+
+
+def scene_at(now)
+{
+  var camera_position = Animations.circular([ "position": pos(0,0,5),
+                                              "around": pos(0,0,0),
+                                              "duration": seconds(5) ])
+
+  var camera = Cameras.perspective( [ "eye": camera_position[now],
+                                      "look_at": pos(0,0,0) ] )
+
+  var p1 = Animations.circular([ "position": pos(0,0,1),
+                                 "around": pos(0,0,0),
+                                 "duration": seconds(1) ])
+
+  var p2 = Animations.circular([ "position": pos(cos(degrees(120)),sin(degrees(120)),0),
+                                 "around": pos(0,0,0),
+                                 "axis": vec(cos(degrees(30)), sin(degrees(30)),0),
+                                 "duration": seconds(1) ])
+
+  var p3 = Animations.circular([ "position": pos(cos(degrees(60)),sin(degrees(60)),0),
+                                 "around": pos(0,0,0),
+                                 "axis": vec(cos(degrees(150)), sin(degrees(150)),0),
+                                 "duration": seconds(1) ])
+
+  var nucleus = decorate(material(Colors.blue()), scale(0.25, 0.25, 0.25, sphere()))
+  var e1 = translate(p1[now] - pos(0,0,0), electron())
+  var e2 = translate(p2[now] - pos(0,0,0), electron())
+  var e3 = translate(p3[now + seconds(0.25)] - pos(0,0,0), electron())
+
+  var root = union([ nucleus, e1, e2, e3 ])
+
+  var lights = [ Lights.omnidirectional( pos(0,5,5), Colors.white() ), Lights.omnidirectional( pos(0,5,-5), Colors.white() ) ]
+
+  create_scene(camera, root, lights)
+}
+
+
+var raytracer   = Raytracers.v6()
+var renderer    = Renderers.standard( [ "width": 500,
+                                        "height": 500,
+                                        "sampler": Samplers.single(),
+                                        "ray_tracer": raytracer ] )
+
+pipeline( scene_animation(scene_at, seconds(5)),
+          [ Pipeline.animation(150),
+            Pipeline.renderer(renderer),
+            Pipeline.ppm()] )
